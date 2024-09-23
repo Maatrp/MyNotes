@@ -85,7 +85,7 @@ namespace MyNotes.Infrastructure.Database
                                 note = new Note(
                                     id,
                                     reader["Title"].ToString(),
-                                    reader["Text"].ToString().Split('\n').ToList(),  
+                                    reader["Text"].ToString().Split('\n').ToList(),
                                     DateTime.Parse(reader["Tc"].ToString()),
                                     DateTime.Parse(reader["Tu"].ToString())
                                 );
@@ -106,17 +106,130 @@ namespace MyNotes.Infrastructure.Database
 
         public bool DelNote(int id)
         {
-            throw new NotImplementedException();
+            bool isDeleted = false;
+
+            try
+            {
+                // Obtenenemos la cadena de conexión desde appsettings.json
+                string connectionString = _configuration.GetConnectionString("SQLiteConnection");
+
+                // Creamos la query
+                string query = "DELETE FROM note WHERE id = @id";
+
+                using (var connection = new SqliteConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // Envío de query a base de datos
+                    using (var command = new SqliteCommand(query, connection))
+                    {
+                        // Agregamos el parámetro @id a la query
+                        command.Parameters.AddWithValue("@id", id);
+                        command.ExecuteNonQuery();
+
+                    }
+                }
+
+                isDeleted = true;
+            }
+            catch (SqliteException ex)
+            {
+                throw new ApplicationException("No se ha podido eliminar la nota en base de datos" + ex.Message);
+            }
+
+
+            return isDeleted;
         }
 
-        public List<Note> GetNotes(List<int> ids)
+
+        public bool UpdateNote(Note note)
         {
-            throw new NotImplementedException();
+            bool isUpdated = false;
+
+            try
+            {
+                // Obtenenemos la cadena de conexión desde appsettings.json
+                string connectionString = _configuration.GetConnectionString("SQLiteConnection");
+
+                // Creamos la query
+                string query = "UPDATE note " +
+                       "SET Title = @Title, Text = @Text, Tu = @TimeUpdated " +
+                       "WHERE id = @id";
+
+                using (var connection = new SqliteConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // Envio de query a base de datos
+                    using (var command = new SqliteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@id", note.Id);
+                        command.Parameters.AddWithValue("@Title", note.Title);
+                        command.Parameters.AddWithValue("@Text", string.Join("\n", note.Text));
+                        command.Parameters.AddWithValue("@TimeUpdated", note.TimeUpdated);
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                isUpdated = true;
+
+            }
+            catch (SqliteException ex)
+            {
+                throw new ApplicationException("No se ha podido actualizar la nota en base de datos" + ex.Message);
+            }
+
+
+            return isUpdated;
         }
 
-        public Note UpdateNote(int id)
+        public List<Note> GetNotes()
         {
-            throw new NotImplementedException();
+            List<Note> noteList = new List<Note>();
+
+            try
+            {
+                // Obtenenemos la cadena de conexión desde appsettings.json
+                string connectionString = _configuration.GetConnectionString("SQLiteConnection");
+
+                // Creamos la query
+                string query = "SELECT * FROM note";
+
+                using (var connection = new SqliteConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // Envío de query a base de datos
+                    using (var command = new SqliteCommand(query, connection))
+                    {
+
+                        // Usamos ExecuteReader para obtener los resultados
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())  // Mientras haya resultados los añade en la lista
+                            {
+                                // Mapeamos los resultados de la base de datos al objeto Note
+                                Note note = new Note(
+                                    Convert.ToInt32(reader["id"]),
+                                    reader["Title"].ToString(),
+                                    reader["Text"].ToString().Split('\n').ToList(),
+                                    DateTime.Parse(reader["Tc"].ToString()),
+                                    DateTime.Parse(reader["Tu"].ToString())
+                                );
+                                noteList.Add(note);
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (SqliteException ex)
+            {
+                throw new ApplicationException("No se ha podido extraer la lista de base de datos" + ex.Message);
+            }
+
+
+            return noteList;
         }
     }
 }

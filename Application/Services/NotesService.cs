@@ -1,6 +1,7 @@
 ﻿using MyNotes.Application.Database;
 using MyNotes.Domain.Entities;
 using MyNotes.Domain.Extensions;
+using System.Collections.Generic;
 
 namespace MyNotes.Application.Services
 {
@@ -34,13 +35,59 @@ namespace MyNotes.Application.Services
 
         public Note GetNote(int id)
         {
-            if (id.IsNullOrEmpty()) {
+            if (id.IsNullOrEmpty())
+            {
                 throw new NullReferenceException("El id no es correcto.");
             }
 
-            Note note= _notesRepository.GetNote(id);
+            Note note = _notesRepository.GetNote(id);
 
             return note;
+
+        }
+
+        public bool DelNote(int id)
+        {
+            bool isDeleted = false;
+
+            if (id.IsNullOrEmpty())
+            {
+                throw new NullReferenceException("El id no es correcto.");
+            }
+
+            isDeleted = _notesRepository.DelNote(id);
+
+            return isDeleted;
+
+        }
+
+        public Note UpdateNote(int id, string title, List<string> text)
+        {
+            if (id > 0 && title.IsNullOrEmpty() && text.IsNullOrEmpty())
+            {
+                throw new NullReferenceException("El id, el título y el texto de la nota no pueden estar vacíos.");
+            }
+
+
+            DateTime timeUpdated = DateTime.Now;
+
+            // Creamos la nota
+            Note note = new Note(id, title, text, timeUpdated);
+
+            _notesRepository.UpdateNote(note);
+
+            return note;
+        }
+
+        public List<Note> GetNotes()
+        {
+            List<Note> noteList = _notesRepository.GetNotes();
+
+            if (!noteList.Any()) {
+                throw new NullReferenceException("No hay ninguna nota");
+            }
+
+            return noteList;
 
         }
     }

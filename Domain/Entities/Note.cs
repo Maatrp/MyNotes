@@ -31,5 +31,13 @@ namespace MyNotes.Domain.Entities
             TimeUpdated = timeUpdated;
         }
 
+        public Note(int id, string title, List<string> text, DateTime timeUpdated)
+        {
+            Id = id;
+            Title = title;
+            Text = text;
+            TimeUpdated = timeUpdated;
+        }
+
     }
 }

@@ -10,9 +10,9 @@ namespace MyNotes.Application.Database
 
         bool DelNote(int id);
 
-        Note UpdateNote(int id);
+        bool UpdateNote(Note note);
 
-        List<Note> GetNotes(List<int> ids);
+        List<Note> GetNotes();
 
     }
 }
