@@ -13,5 +13,17 @@ namespace MyNotes.Domain.Extensions
         {
             return string.IsNullOrEmpty(val);
         }
+
+        public static bool IsNullOrEmpty(this int val)
+        {
+            bool result = false;
+
+            if (val == 0 || val == null)
+            {
+                result = true;
+            }
+
+            return result;
+        }
     }
 }

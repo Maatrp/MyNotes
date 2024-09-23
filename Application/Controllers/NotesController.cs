@@ -24,15 +24,55 @@ namespace MyNotes.Application.Controllers
 
         // POST api/<NotesController>
         [HttpPost("create-note")]
-        public void CreateNote([FromHeader] string title, [FromBody] List<string> text)
+        public IActionResult CreateNote([FromHeader] string title, [FromBody] List<string> text)
         {
-            if (title.IsNullOrEmpty() && text.IsNullOrEmpty()) {
-                _logger.LogWarning("El título y el texto de la nota no pueden estar vacíos.");
+            if (title.IsNullOrEmpty() && text.IsNullOrEmpty())
+            {
+                String textMessage = "El título y el texto de la nota no pueden estar vacíos.";
+                _logger.LogWarning(textMessage);
+                return BadRequest(textMessage);
             }
 
+            try
+            {
+                Note note = _notesService.CreateNote(title, text);
 
-
+                return Ok(note);
+            }
+            catch (Exception ex)
+            {
+                String textMessage = "Ha ocurrido un error";
+                _logger.LogError(textMessage + ex);
+                return BadRequest (textMessage);
+            }
         }
+
+        // GET api/<NotesController>
+        [HttpPost("get-note/{id}")]
+        public IActionResult GetNote([FromRoute] int id)
+        {
+            if (id.IsNullOrEmpty())
+            {
+                String textMessage = "El id no es correcto.";
+                _logger.LogWarning(textMessage);
+                return BadRequest(textMessage);
+            }
+
+            try
+            {
+                Note note = _notesService.GetNote(id);
+
+                return Ok(note);
+            }
+            catch (Exception ex)
+            {
+                String textMessage = "Ha ocurrido un error";
+                _logger.LogError(textMessage + ex);
+                return BadRequest(textMessage);
+            }
+        }
+
+
 
     }
 }

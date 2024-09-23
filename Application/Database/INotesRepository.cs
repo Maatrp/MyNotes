@@ -12,7 +12,7 @@ namespace MyNotes.Application.Database
 
         Note UpdateNote(int id);
 
-        ArrayList<Note> GetNotes(ArrayList<int> ids);
+        List<Note> GetNotes(List<int> ids);
 
     }
 }
