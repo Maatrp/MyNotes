@@ -21,13 +21,27 @@ namespace MyNotes.Application.Services
                 throw new NullReferenceException("El título y el texto de la nota no pueden estar vacíos.");
             }
 
-            // Creamos la nota
-            Note _note = new Note(title, text);
+            DateTime timeCreation = DateTime.Now;
+            DateTime timeUpdated = DateTime.Now;
 
-            return _note;
+            // Creamos la nota
+            Note note = new Note(title, text, timeCreation, timeUpdated);
+
+            _notesRepository.CreateNote(note);
+
+            return note;
         }
 
+        public Note GetNote(int id)
+        {
+            if (id.IsNullOrEmpty()) {
+                throw new NullReferenceException("El id no es correcto.");
+            }
 
+            Note note= _notesRepository.GetNote(id);
 
+            return note;
+
+        }
     }
 }
